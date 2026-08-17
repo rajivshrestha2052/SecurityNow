@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Booking
+from .models import Booking, BookingApplication
 
 
 class BookingSerializer(serializers.ModelSerializer):
@@ -42,3 +42,58 @@ class BookingSerializer(serializers.ModelSerializer):
                 )
 
         return data
+
+class BookingApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookingApplication
+        fields = (
+            "id",
+            "booking",
+            "message",
+            "status",
+            "created_at",
+        )
+
+        read_only_fields = (
+            "id",
+            "booking",
+            "status",
+            "created_at",
+        )
+
+    def validate(self, attrs):
+        request = self.context["request"]
+        booking_id = self.context["view"].kwargs["booking_id"]
+
+        if BookingApplication.objects.filter(
+            booking_id=booking_id,
+            guard=request.user,
+        ).exists():
+            raise serializers.ValidationError(
+                {
+                    "detail": "You have already applied for this booking."
+                }
+            )
+
+        return attrs
+
+class BookingApplicationDetailSerializer(serializers.ModelSerializer):
+    guard_id = serializers.IntegerField(
+        source="guard.id",
+        read_only=True,
+    )
+    guard_username = serializers.CharField(
+        source="guard.username",
+        read_only=True,
+    )
+
+    class Meta:
+        model = BookingApplication
+        fields = (
+            "id",
+            "guard_id",
+            "guard_username",
+            "message",
+            "status",
+            "created_at",
+        )
