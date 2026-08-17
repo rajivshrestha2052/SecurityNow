@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-
+from apps.customers.models import CustomerProfile
+from apps.guards.models import GuardProfile
+from django.db import transaction
 User = get_user_model()
 
 
@@ -38,10 +39,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop("password")
+        with transaction.atomic():
+            user = User(**validated_data)
+            user.set_password(password)
+            user.save()
 
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
+            if user.role == User.Role.CUSTOMER:
+                CustomerProfile.objects.create(user=user)
+            elif user.role == User.Role.GUARD:
+                GuardProfile.objects.create(user=user)
 
         return user
 
