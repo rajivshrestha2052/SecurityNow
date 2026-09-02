@@ -22,8 +22,18 @@ class Booking(models.Model):
         blank=True,
     )
 
-    location = models.CharField(
-        max_length=255,
+    address = models.CharField(
+    max_length=255,
+    )
+
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+    )
+
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
     )
 
     start_datetime = models.DateTimeField()

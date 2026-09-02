@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import GuardProfile
+from .models import GuardProfile, GuardLocation
 
 
 class GuardProfileSerializer(serializers.ModelSerializer):
@@ -30,12 +30,61 @@ class GuardProfileSerializer(serializers.ModelSerializer):
             "experience_years",
             "bio",
             "is_available",
+            "current_latitude",
+            "current_longitude",
+            "location_updated_at",
             "created_at",
             "updated_at",
         )
 
         read_only_fields = (
             "verification_status",
+            
+            "current_latitude",
+            "current_longitude",
+            "location_updated_at",
             "created_at",
             "updated_at",
         )
+
+class GuardLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GuardLocation
+        fields = (
+            "id",
+            "guard",
+            "booking",
+            "latitude",
+            "longitude",
+            "recorded_at",
+        )
+
+        read_only_fields = (
+            "id",
+            "guard",
+            "recorded_at",
+        )
+
+    def validate(self, data):
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+
+        if latitude < -90 or latitude > 90:
+            raise serializers.ValidationError(
+                {
+                    "latitude": (
+                        "Latitude must be between -90 and 90."
+                    )
+                }
+            )
+
+        if longitude < -180 or longitude > 180:
+            raise serializers.ValidationError(
+                {
+                    "longitude": (
+                        "Longitude must be between -180 and 180."
+                    )
+                }
+            )
+
+        return data

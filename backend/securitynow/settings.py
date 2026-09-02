@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     "rest_framework_simplejwt.token_blacklist",
+    "channels",
     'apps.accounts',
     'apps.bookings',
     'apps.customers',
@@ -104,6 +105,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'securitynow.wsgi.application'
 
+ASGI_APPLICATION = "securitynow.asgi.application"
+
+#Configuring Redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                ("127.0.0.1", 6379)
+            ],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases

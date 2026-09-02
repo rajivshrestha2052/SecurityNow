@@ -10,7 +10,9 @@ class BookingSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "description",
-            "location",
+            "address",
+            "latitude",
+            "longitude",
             "start_datetime",
             "end_datetime",
             "guards_required",
@@ -29,7 +31,9 @@ class BookingSerializer(serializers.ModelSerializer):
     def validate(self, data):
         start_datetime = data.get("start_datetime")
         end_datetime = data.get("end_datetime")
-
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
+        
         if start_datetime and end_datetime:
             if end_datetime <= start_datetime:
                 raise serializers.ValidationError(
@@ -38,6 +42,22 @@ class BookingSerializer(serializers.ModelSerializer):
                             "End date and time must be after "
                             "the start date and time."
                         )
+                    }
+                )
+
+        if latitude is not None:
+            if latitude < -90 or latitude > 90:
+                raise serializers.ValidationError(
+                    {
+                        "latitude": "Latitude must be between -90 and 90."
+                    }
+                )
+
+        if longitude is not None:
+            if longitude < -180 and longitude > 180:
+                raise serializers.ValidationError(
+                    {
+                        "longitude": "Longitude must be between -180 and 180"
                     }
                 )
 

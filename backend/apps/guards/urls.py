@@ -1,6 +1,9 @@
 from django.urls import path
 
-from .views import GuardProfileView
+from .views import (
+    GuardProfileView,
+    GuardAvailabilityView,
+)
 
 
 urlpatterns = [
@@ -8,5 +11,10 @@ urlpatterns = [
         "profile/",
         GuardProfileView.as_view(),
         name="guard-profile",
+    ),
+    path(
+        "availability/",
+        GuardAvailabilityView.as_view(),
+        name="guard-availability",
     ),
 ]
